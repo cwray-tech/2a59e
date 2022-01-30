@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_01_30_000629) do
+ActiveRecord::Schema.define(version: 2022_01_30_001927) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -56,6 +56,13 @@ ActiveRecord::Schema.define(version: 2022_01_30_000629) do
     t.bigint "prospect_id", null: false
     t.index ["campaign_id", "prospect_id"], name: "index_campaigns_prospects_on_campaign_id_and_prospect_id"
     t.index ["prospect_id", "campaign_id"], name: "index_campaigns_prospects_on_prospect_id_and_campaign_id"
+  end
+
+  create_table "prospect_files", force: :cascade do |t|
+    t.integer "total"
+    t.integer "done"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "prospects", force: :cascade do |t|
