@@ -1,15 +1,25 @@
-class ProspectFilesController < ApplicationController
+class Api::ProspectFilesController < ApplicationController
   def import
     # Create a new ProspectFile
     prospect_file = ProspectFile.new
     prospect_file.file = params[:file]
+    prospect_file.email_index = params[:email_index]
+    prospect_file.first_name_index = params[:first_name_index]
+    prospect_file.last_name_index = params[:last_name_index]
+    prospect_file.force = params[:force]
+    prospect_file.has_headers = params[:has_headers]
     prospect_file.save
 
-    # Send the file to the import job
-    ImportProspectsJob.perform_later(prospect_file.id)
+    # If the validation fails, return an error
+    if !prospect_file.valid?  
+      render json: {errors: prospect_file.errors.full_messages}, status: :unprocessable_entity
+    else
+      ImportProspectsJob.perform_later(prospect_file)
+      
+      # Return success message
+      render json: { message: "Prospects are being imported." }, status: :ok
+    end
 
-    # Return the status of the import job
-    render json: { status: prospect_file.status }
   end
 
   def progress
