@@ -59,8 +59,13 @@ ActiveRecord::Schema.define(version: 2022_01_30_001927) do
   end
 
   create_table "prospect_files", force: :cascade do |t|
-    t.integer "total"
-    t.integer "done"
+    t.integer "email_index", null: false
+    t.integer "first_name_index"
+    t.integer "last_name_index"
+    t.boolean "force", default: false
+    t.boolean "has_headers", default: false
+    t.integer "total", default: 0
+    t.integer "done", default: 0
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
