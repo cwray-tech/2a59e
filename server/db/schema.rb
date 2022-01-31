@@ -66,8 +66,10 @@ ActiveRecord::Schema.define(version: 2022_01_30_001927) do
     t.boolean "has_headers", default: false
     t.integer "total", default: 0
     t.integer "done", default: 0
+    t.bigint "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_prospect_files_on_user_id"
   end
 
   create_table "prospects", force: :cascade do |t|
@@ -91,5 +93,6 @@ ActiveRecord::Schema.define(version: 2022_01_30_001927) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "campaigns", "users"
+  add_foreign_key "prospect_files", "users"
   add_foreign_key "prospects", "users"
 end

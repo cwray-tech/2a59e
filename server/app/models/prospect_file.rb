@@ -1,13 +1,28 @@
+require 'csv'
+
 class ProspectFile < ApplicationRecord
   has_one_attached :file
+  belongs_to :user
 
   validates :file, :email_index, presence: true
+  validate :file_must_be_csv
   validates :email_index, numericality: { only_integer: true }, inclusion: { in: 0..100, message: "must be a number between 0 and 100" }
   validates :first_name_index, :last_name_index, allow_nil: true, allow_blank: true, numericality: { only_integer: true }, inclusion: { in: 0..100, message: "must be a number between 0 and 100" }
-  validate :file_must_be_csv
+  validates :force, :has_headers, inclusion: { in: [true, false] } , allow_blank: true, allow_nil: true
 
   def import_prospects 
-    
+    csv = CSV.parse(file.download, headers: has_headers, col_sep: ",")
+    total = csv.count
+    done = 0
+    self.update(total: total, done: done)
+
+    csv.each do |row|
+      prospect = user.prospects.create(email: row[email_index])
+      prospect.update(first_name: row[first_name_index], last_name: row[last_name_index])
+
+      done += 1
+      self.update(done: done)
+    end
   end
 
   def file_must_be_csv
