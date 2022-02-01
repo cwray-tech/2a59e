@@ -16,7 +16,7 @@ class Api::ProspectFilesController < ApplicationController
   def progress
     @prospect_file = @user.prospect_files.find(params[:id])
 
-    render json: { total: @prospect_file.total, done: @prospect_file.done, time_elapsed: @prospect_file.updated_at - @prospect_file.created_at }
+    render json: { total: @prospect_file.total, done: @prospect_file.done }
   end
 
 
