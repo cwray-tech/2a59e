@@ -11,15 +11,19 @@ class ProspectFile < ApplicationRecord
   validates :force, :has_headers, inclusion: { in: [true, false] } , allow_blank: true, allow_nil: true
 
   def import_prospects 
-    csv = CSV.parse(file.download, headers: has_headers, col_sep: ",")
+    csv = CSV.parse(file.download, headers: has_headers)
     total = csv.count
     done = 0
     self.update(total: total, done: done)
-
     csv.each do |row|
-      prospect = user.prospects.create(email: row[email_index])
-      prospect.update(first_name: row[first_name_index], last_name: row[last_name_index])
-
+      # Create a new prospect if it doesn't exist
+      @prospect = Prospect.find_by(email: row[email_index], user: user)
+      
+      if @prospect.nil?
+        @prospect = Prospect.create(email: row[email_index], first_name: row[first_name_index], last_name: row[last_name_index], user: user)
+      elsif force
+        @prospect.update(first_name: row[first_name_index], last_name: row[last_name_index])
+      end
       done += 1
       self.update(done: done)
     end
