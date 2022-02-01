@@ -15,15 +15,17 @@ class ProspectFile < ApplicationRecord
     total = csv.count
     done = 0
     self.update(total: total, done: done)
+
     csv.each do |row|
       # Create a new prospect if it doesn't exist
-      @prospect = Prospect.find_by(email: row[email_index], user: user)
+      @prospect = user.prospects.find_by(email: row[email_index])
       
       if @prospect.nil?
-        @prospect = Prospect.create(email: row[email_index], first_name: row[first_name_index], last_name: row[last_name_index], user: user)
+        @prospect = user.prospects.create(email: row[email_index], first_name: row[first_name_index], last_name: row[last_name_index])
       elsif force
         @prospect.update(first_name: row[first_name_index], last_name: row[last_name_index])
       end
+
       done += 1
       self.update(done: done)
     end
