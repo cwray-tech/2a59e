@@ -10,13 +10,15 @@ class Api::ProspectFilesController < ApplicationController
     else
       render json: {errors: @prospect_file.errors.full_messages}, status: :unprocessable_entity
     end
-
   end
 
   def progress
     @prospect_file = @user.prospect_files.find(params[:id])
-
     render json: { total: @prospect_file.total, done: @prospect_file.prospects.count}, status: :ok
+  
+    # if there is no prospect file with the given id, return 404
+    rescue ActiveRecord::RecordNotFound => e
+      render json: { errors: e.to_s }, status: :not_found
   end
 
 
