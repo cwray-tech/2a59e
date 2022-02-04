@@ -3,6 +3,7 @@ require 'csv'
 class ProspectFile < ApplicationRecord
   has_one_attached :file
   belongs_to :user
+  has_many :prospects
 
   validates :file, :email_index, presence: true
   validate :file_must_be_csv
@@ -13,7 +14,6 @@ class ProspectFile < ApplicationRecord
   def import_prospects 
     csv = CSV.parse(file.download, headers: has_headers)
     total = csv.count
-    done = 0
     self.update(total: total, done: done)
 
     csv.each do |row|
@@ -21,13 +21,17 @@ class ProspectFile < ApplicationRecord
       @prospect = user.prospects.find_by(email: row[email_index])
       
       if @prospect.nil?
-        @prospect = user.prospects.create(email: row[email_index], first_name: row[first_name_index], last_name: row[last_name_index])
+        @prospect = user.prospects.create(
+          email: row[email_index], 
+          first_name: row[first_name_index], 
+          last_name: row[last_name_index], 
+          prospect_file: self)
       elsif force
-        @prospect.update(first_name: row[first_name_index], last_name: row[last_name_index])
+        @prospect.update(
+          first_name: row[first_name_index], 
+          last_name: row[last_name_index], 
+          prospect_file: self)
       end
-
-      done += 1
-      self.update(done: done)
     end
   end
 
