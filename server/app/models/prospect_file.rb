@@ -14,20 +14,20 @@ class ProspectFile < ApplicationRecord
   def import_prospects 
     csv = CSV.parse(file.download, headers: has_headers)
     total = csv.count
-    self.update(total: total, done: done)
+    self.update(total: total)
 
     csv.each do |row|
       # Create a new prospect if it doesn't exist
-      @prospect = user.prospects.find_by(email: row[email_index])
+      prospect = user.prospects.find_by(email: row[email_index])
       
-      if @prospect.nil?
-        @prospect = user.prospects.create(
+      if prospect.nil?
+        prospect = user.prospects.create(
           email: row[email_index], 
           first_name: row[first_name_index], 
           last_name: row[last_name_index], 
           prospect_file: self)
       elsif force
-        @prospect.update(
+        prospect.update(
           first_name: row[first_name_index], 
           last_name: row[last_name_index], 
           prospect_file: self)
